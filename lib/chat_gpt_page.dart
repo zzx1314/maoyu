@@ -20,11 +20,13 @@ class _ChatGptPageState extends State<ChatGptPage> {
     if (text.isEmpty) return;
 
     setState(() {
-      _messages.add(_Message(
-        text: text,
-        isMe: true,
-        time: DateFormat('HH:mm').format(DateTime.now()),
-      ));
+      _messages.add(
+        _Message(
+          text: text,
+          isMe: true,
+          time: DateFormat('HH:mm').format(DateTime.now()),
+        ),
+      );
       _controller.clear();
       _isTyping = true;
     });
@@ -34,11 +36,13 @@ class _ChatGptPageState extends State<ChatGptPage> {
     // 模拟 ChatGPT 回复
     Future.delayed(const Duration(milliseconds: 800), () {
       setState(() {
-        _messages.add(_Message(
-          text: "🤖 ChatGPT：你刚才说的是 \"$text\"。\n这是一条模拟的回复内容。",
-          isMe: false,
-          time: DateFormat('HH:mm').format(DateTime.now()),
-        ));
+        _messages.add(
+          _Message(
+            text: "🤖 ChatGPT：你刚才说的是 \"$text\"。\n这是一条模拟的回复内容。",
+            isMe: false,
+            time: DateFormat('HH:mm').format(DateTime.now()),
+          ),
+        );
         _isTyping = false;
       });
       _scrollToBottom();
@@ -87,11 +91,18 @@ class _ChatGptPageState extends State<ChatGptPage> {
 
           // 输入框
           Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border(
-                top: BorderSide(color: Colors.grey.shade300),
-              ),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.grey.shade300, width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade200,
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: SafeArea(
@@ -134,8 +145,9 @@ class _ChatBubble extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment:
-        isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isMe
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         children: [
           if (!isMe)
             const CircleAvatar(
@@ -151,17 +163,19 @@ class _ChatBubble extends StatelessWidget {
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(14),
                   topRight: const Radius.circular(14),
-                  bottomLeft:
-                  isMe ? const Radius.circular(14) : const Radius.circular(0),
-                  bottomRight:
-                  isMe ? const Radius.circular(0) : const Radius.circular(14),
+                  bottomLeft: isMe
+                      ? const Radius.circular(14)
+                      : const Radius.circular(0),
+                  bottomRight: isMe
+                      ? const Radius.circular(0)
+                      : const Radius.circular(14),
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.shade200,
                     blurRadius: 4,
                     offset: const Offset(0, 2),
-                  )
+                  ),
                 ],
               ),
               child: Text(
@@ -221,10 +235,7 @@ class _TypingIndicatorState extends State<_TypingIndicator>
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade200,
-                    blurRadius: 4,
-                  )
+                  BoxShadow(color: Colors.grey.shade200, blurRadius: 4),
                 ],
               ),
               child: Text('.' * t, style: const TextStyle(fontSize: 20)),
