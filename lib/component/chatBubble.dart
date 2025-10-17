@@ -4,7 +4,7 @@ import '../modes/message.dart';
 // 💬 消息气泡组件
 class ChatBubble extends StatelessWidget {
   final Message message;
-  const ChatBubble({required this.message});
+  const ChatBubble({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
