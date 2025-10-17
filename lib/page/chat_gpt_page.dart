@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../component/typing_indicator.dart';
+import '../modes/message.dart';
+import '../component/chatBubble.dart';
 
 class ChatGptPage extends StatefulWidget {
   const ChatGptPage({super.key});
@@ -12,7 +15,7 @@ class _ChatGptPageState extends State<ChatGptPage> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  final List<_Message> _messages = [];
+  final List<Message> _messages = [];
   bool _isTyping = false;
 
   void _sendMessage() {
@@ -21,7 +24,7 @@ class _ChatGptPageState extends State<ChatGptPage> {
 
     setState(() {
       _messages.add(
-        _Message(
+        Message(
           text: text,
           isMe: true,
           time: DateFormat('HH:mm').format(DateTime.now()),
@@ -37,7 +40,7 @@ class _ChatGptPageState extends State<ChatGptPage> {
     Future.delayed(const Duration(milliseconds: 800), () {
       setState(() {
         _messages.add(
-          _Message(
+          Message(
             text: "🤖 ChatGPT：你刚才说的是 \"$text\"。\n这是一条模拟的回复内容。",
             isMe: false,
             time: DateFormat('HH:mm').format(DateTime.now()),
@@ -90,11 +93,11 @@ class _ChatGptPageState extends State<ChatGptPage> {
                   itemBuilder: (context, index) {
                     if (_isTyping && index == _messages.length) {
                       // 打字动画
-                      return _TypingIndicator();
+                      return TypingIndicator();
                     }
 
                     final msg = _messages[index];
-                    return _ChatBubble(message: msg);
+                    return ChatBubble(message: msg);
                   },
                 ),
               ),
@@ -144,133 +147,4 @@ class _ChatGptPageState extends State<ChatGptPage> {
       ),
     );
   }
-}
-
-// 💬 消息气泡组件
-class _ChatBubble extends StatelessWidget {
-  final _Message message;
-  const _ChatBubble({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    final isMe = message.isMe;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: isMe
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
-        children: [
-          if (!isMe)
-            const CircleAvatar(
-              radius: 18,
-              backgroundImage: AssetImage('assets/chatgpt_icon.png'),
-            ),
-          if (!isMe) const SizedBox(width: 8),
-          Flexible(
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isMe ? Colors.green.shade100 : Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(14),
-                  topRight: const Radius.circular(14),
-                  bottomLeft: isMe
-                      ? const Radius.circular(14)
-                      : const Radius.circular(0),
-                  bottomRight: isMe
-                      ? const Radius.circular(0)
-                      : const Radius.circular(14),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade200,
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Text(
-                message.text,
-                style: const TextStyle(fontSize: 15, height: 1.4),
-              ),
-            ),
-          ),
-          if (isMe) const SizedBox(width: 8),
-          if (isMe)
-            const CircleAvatar(
-              radius: 18,
-              backgroundImage: AssetImage('assets/user_icon.png'),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-// ⌛ 打字动画组件
-class _TypingIndicator extends StatefulWidget {
-  @override
-  State<_TypingIndicator> createState() => _TypingIndicatorState();
-}
-
-class _TypingIndicatorState extends State<_TypingIndicator>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    )..repeat();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const CircleAvatar(
-          radius: 18,
-          backgroundImage: AssetImage('assets/chatgpt_icon.png'),
-        ),
-        const SizedBox(width: 8),
-        AnimatedBuilder(
-          animation: _controller,
-          builder: (context, _) {
-            final t = (_controller.value * 3).floor() + 1;
-            return Container(
-              margin: const EdgeInsets.symmetric(vertical: 6),
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(color: Colors.grey.shade200, blurRadius: 4),
-                ],
-              ),
-              child: Text('.' * t, style: const TextStyle(fontSize: 20)),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-}
-
-class _Message {
-  final String text;
-  final bool isMe;
-  final String time;
-
-  _Message({required this.text, required this.isMe, required this.time});
 }
